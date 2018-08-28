@@ -1,0 +1,45 @@
+{
+    "name": "formatOnIdle",
+    "displayName": "Format On Idle",
+    "description": "Format the current file when you stop typing",
+    "icon": "icon.png",
+    "version": "0.0.14",
+    "publisher": "Gruntfuggly",
+    "repository": "https://github.com/Gruntfuggly/formatOnIdle",
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "formatOnIdlen.format",
+                "title": "Format On Idle: Format"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "formatOnIdle configuration",
+            "properties": {
+                "autoAlign.enabled": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "autoAlign.delay": {
+                    "type": "number",
+                    "description": "The delay in milliseconds before formatting",
+                    "default": 1000
+                }
+            }
+        }
+    },
+    "devDependencies": {
+        "vscode": "^1.0.0"
+    }
+}
