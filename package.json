@@ -3,7 +3,7 @@
     "displayName": "Format On Idle",
     "description": "Format the current file when you stop typing",
     "icon": "icon.png",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "publisher": "Gruntfuggly",
     "repository": "https://github.com/Gruntfuggly/formatOnIdle",
     "engines": {

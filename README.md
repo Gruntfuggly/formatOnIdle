@@ -14,9 +14,9 @@ Once a file extension has been enabled or disabled, the state is stored in your 
 
 ## Configuration
 
-Use `formatOnIdle.delay` to change the delay after which the formatting is triggered.
+Use `formatOnIdle.delay` to change the delay after which the formatting is triggered. The value is specified in milliseconds. The default delay is 1 second.
 
-  `formatOnIdle.enabled` can be manually modified to set the state for specific file extensions.
+`formatOnIdle.enabled` can be manually modified to set the state for specific file extensions.
 
 The position of the status bar button can be configured using `formatOnIdle.buttonAlignment` and `formatOnIdle.buttonPriority`.
 
