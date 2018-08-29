@@ -1,3 +1,6 @@
+# v0.0.5 - 2018-08-29
+- Reset format trigger on cursor movement too
+
 # v0.0.4 - 2018-08-29
 - Add default delay details to README.md
 
