@@ -114,7 +114,14 @@ function activate( context )
     }
 
     context.subscriptions.push( vscode.workspace.onDidChangeTextDocument( triggerFormat ) );
-    context.subscriptions.push( vscode.window.onDidChangeTextEditorSelection( triggerFormat ) );
+    context.subscriptions.push( vscode.window.onDidChangeTextEditorSelection( function( e )
+    {
+        if( e.kind === vscode.TextEditorSelectionChangeKind.Keyboard ||
+            e.kind === vscode.TextEditorSelectionChangeKind.Mouse )
+        {
+            triggerFormat();
+        }
+    } ) );
 
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.enable', function() { configure( true ); } ) );
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.disable', function() { configure( false ); } ) );

@@ -1,3 +1,6 @@
+# v0.0.6 - 2018-08-29
+- Only trigger when selection events are from the keyboard or mouse
+
 # v0.0.5 - 2018-08-29
 - Reset format trigger on cursor movement too
 
