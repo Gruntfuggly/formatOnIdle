@@ -22,15 +22,11 @@ The position of the status bar button can be configured using `formatOnIdle.butt
 
 ## Installing
 
-You can install the latest version of the extension via the Visual Studio Marketplace [here](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.formatOnIdle).
-
-Alternatively, open Visual Studio code, press `Ctrl+P` or `Cmd+P` and type:
-
-    > ext install format-on-idle
+You can install the latest version of the extension via the Visual Studio Marketplace [here](https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.format-on-idle).
 
 ### Source Code
 
-The source code is available on GitHub [here](https://github.com/Gruntfuggly/formatOnIdle).
+The source code is available on GitHub [here](https://github.com/Gruntfuggly/format-on-idle).
 
 ## Known Issues
 
