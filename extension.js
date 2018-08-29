@@ -6,9 +6,31 @@ var button;
 
 function activate( context )
 {
+    function checkFormatterAvailable( done )
+    {
+        var editor = vscode.window.activeTextEditor;
+        if( editor && editor.document )
+        {
+            vscode.commands.executeCommand( 'vscode.executeFormatDocumentProvider', editor.document.uri, {} ).then( function()
+            {
+                done( true );
+            } ).catch( e =>
+            {
+                done( false );
+            } );
+        }
+        done( false );
+    }
+
     function doFormat()
     {
-        vscode.commands.executeCommand( 'editor.action.format' );
+        checkFormatterAvailable( function( available )
+        {
+            if( available )
+            {
+                vscode.commands.executeCommand( 'editor.action.format' );
+            }
+        } );
     }
 
     function getExtension()
@@ -54,14 +76,17 @@ function activate( context )
         button.command = 'formatOnIdle.' + ( enabled ? 'disable' : 'enable' );
         button.tooltip = ( enabled ? 'Disable' : 'Enable' ) + " Format On Idle for ." + extension + " files";
 
-        if( extension.length > 0 )
+        checkFormatterAvailable( function( available )
         {
-            button.show();
-        }
-        else
-        {
-            button.hide();
-        }
+            if( extension.length > 0 && available )
+            {
+                button.show();
+            }
+            else
+            {
+                button.hide();
+            }
+        } );
     }
 
     function createButton()
@@ -99,6 +124,19 @@ function activate( context )
         updateButton();
     } ) );
 
+    vscode.workspace.onDidOpenTextDocument( function()
+    {
+        if( !button )
+        {
+            createButton();
+        }
+        else
+        {
+            clearTimeout( timer );
+            updateButton();
+        }
+    } );
+
     context.subscriptions.push( vscode.workspace.onDidChangeConfiguration( function( e )
     {
         if(
@@ -115,8 +153,6 @@ function activate( context )
             createButton();
         }
     } ) );
-
-    createButton();
 }
 
 exports.activate = activate;

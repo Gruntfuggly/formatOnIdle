@@ -4,7 +4,7 @@ This a very simple extension that enables formatting of the current file after a
 
 By default it is enabled for all file extensions (except files without extensions).
 
-When the current file has an extension, a button is displayed in the status bar (a watch with a tick or a cross next to it) indicating if **Format On Idle** is enabled for the current file extension:
+When the current file has an extension and an available formatter, a button is displayed in the status bar (a watch with a tick or a cross next to it) indicating if **Format On Idle** is enabled for the current file extension:
 
 <img src="https://raw.githubusercontent.com/Gruntfuggly/formatOnIdle/master/button.png">
 
@@ -16,7 +16,7 @@ Once a file extension has been enabled or disabled, the state is stored in your 
 
 Use `formatOnIdle.delay` to change the delay after which the formatting is triggered.
 
-`formatOnIdle.enabled` can be manually modified to set the state for specific file extensions.
+  `formatOnIdle.enabled` can be manually modified to set the state for specific file extensions.
 
 The position of the status bar button can be configured using `formatOnIdle.buttonAlignment` and `formatOnIdle.buttonPriority`.
 
