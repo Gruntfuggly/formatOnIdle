@@ -27,11 +27,7 @@ function activate( context )
         var editor = vscode.window.activeTextEditor;
         if( editor && editor.document )
         {
-            var options = {
-                tabSize: vscode.workspace.getConfiguration( 'editor' ).get( 'tabSize' ),
-                insertSpaces: vscode.workspace.getConfiguration( 'editor' ).get( 'insertSpaces' )
-            };
-
+            var options = vscode.workspace.getConfiguration( 'editor' );
             vscode.commands.executeCommand( 'vscode.executeFormatDocumentProvider', editor.document.uri, options ).then( function( edits )
             {
                 var workspaceEdit = new vscode.WorkspaceEdit();

@@ -1,3 +1,6 @@
+# v0.0.8 - 2018-08-29
+- Use all editor settings for simplicity
+
 # v0.0.7 - 2018-08-29
 - Apply edits from formatDocumentProvider instead of calling editor.action.format
 
