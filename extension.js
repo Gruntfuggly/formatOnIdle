@@ -6,7 +6,7 @@ var button;
 
 function activate( context )
 {
-    function checkFormatterAvailable( done )
+    function isFormatterAvailable( done )
     {
         var editor = vscode.window.activeTextEditor;
         if( editor && editor.document )
@@ -14,7 +14,7 @@ function activate( context )
             vscode.commands.executeCommand( 'vscode.executeFormatDocumentProvider', editor.document.uri, {} ).then( function()
             {
                 done( true );
-            } ).catch( e =>
+            } ).catch( function()
             {
                 done( false );
             } );
@@ -24,13 +24,21 @@ function activate( context )
 
     function doFormat()
     {
-        checkFormatterAvailable( function( available )
+        var editor = vscode.window.activeTextEditor;
+        if( editor && editor.document )
         {
-            if( available )
+            var options = {
+                tabSize: vscode.workspace.getConfiguration( 'editor' ).get( 'tabSize' ),
+                insertSpaces: vscode.workspace.getConfiguration( 'editor' ).get( 'insertSpaces' )
+            };
+
+            vscode.commands.executeCommand( 'vscode.executeFormatDocumentProvider', editor.document.uri, options ).then( function( edits )
             {
-                vscode.commands.executeCommand( 'editor.action.format' );
-            }
-        } );
+                var workspaceEdit = new vscode.WorkspaceEdit();
+                workspaceEdit.set( editor.document.uri, edits );
+                vscode.workspace.applyEdit( workspaceEdit );
+            } ).catch( {} );
+        }
     }
 
     function getExtension()
@@ -76,7 +84,7 @@ function activate( context )
         button.command = 'formatOnIdle.' + ( enabled ? 'disable' : 'enable' );
         button.tooltip = ( enabled ? 'Disable' : 'Enable' ) + " Format On Idle for ." + extension + " files";
 
-        checkFormatterAvailable( function( available )
+        isFormatterAvailable( function( available )
         {
             if( extension.length > 0 && available )
             {
@@ -126,7 +134,7 @@ function activate( context )
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.enable', function() { configure( true ); } ) );
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.disable', function() { configure( false ); } ) );
 
-    context.subscriptions.push( vscode.window.onDidChangeActiveTextEditor( function() 
+    context.subscriptions.push( vscode.window.onDidChangeActiveTextEditor( function()
     {
         clearTimeout( timer );
         updateButton();
@@ -163,10 +171,10 @@ function activate( context )
     } ) );
 }
 
-exports.activate = activate;
-
 function deactivate()
 {
     clearTimeout( timer );
 }
+
+exports.activate = activate;
 exports.deactivate = deactivate;

@@ -1,3 +1,6 @@
+# v0.0.7 - 2018-08-29
+- Apply edits from formatDocumentProvider instead of calling editor.action.format
+
 # v0.0.6 - 2018-08-29
 - Only trigger when selection events are from the keyboard or mouse
 
