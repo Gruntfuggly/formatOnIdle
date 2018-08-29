@@ -1,60 +1,128 @@
-var vscode = require( 'vscode' ),
-    path = require( 'path' );
+var vscode = require( 'vscode' );
+var path = require( 'path' );
+
+var timer;
+var button;
 
 function activate( context )
 {
-    function go( e )
+    function doFormat()
+    {
+        vscode.commands.executeCommand( 'editor.action.format' );
+    }
+
+    function getExtension()
     {
         var editor = vscode.window.activeTextEditor;
-        var version = editor.document.version;
-
-        if( !lastVersion || version > lastVersion )
+        if( editor && editor.document )
         {
-            lastVersion = version;
-            clearTimeout( formatTimeout );
-            if( vscode.workspace.getConfiguration( 'autoAlign' ).enabled[ getExtension() ] )
+            ext = path.extname( editor.document.fileName );
+            if( ext && ext.length > 1 )
             {
-                var delay = vscode.workspace.getConfiguration( 'autoAlign' ).delay;
-                if( e && ( e.kind && e.kind == vscode.TextEditorSelectionChangeKind.Mouse ) )
-                {
-                    delay = 0;
-                }
-
-                formatTimeout = setTimeout( function()
-                {
-                    if( !e || e.kind === undefined || e.kind == vscode.TextEditorSelectionChangeKind.Keyboard )
-                    {
-                        align( vscode.workspace.getConfiguration( 'autoAlign' ).enabled[ getExtension() ] === true );
-                    }
-                    positionCursor();
-                    setTimeout( decorate, 100 );
-                }, delay );
+                return ext.substr( 1 );
             }
         }
+        return "";
     }
 
-    vscode.window.onDidChangeTextEditorSelection( go );
-    vscode.window.onDidChangeActiveTextEditor( function( e )
+    function isEnabled()
     {
-        var enabled = vscode.workspace.getConfiguration( 'autoAlign' ).enabled[ getExtension() ];
-        vscode.commands.executeCommand( 'setContext', 'auto-align-enabled', enabled );
-        if( enabled )
+        var extension = getExtension();
+        var enabled = vscode.workspace.getConfiguration( 'formatOnIdle' ).get( 'enabled' );
+        return Object.keys( enabled ).length === 0 || ( extension.length > 0 && enabled[ extension ] );
+    }
+
+    function triggerFormat()
+    {
+        var delay = parseInt( vscode.workspace.getConfiguration( 'formatOnIdle' ).get( 'delay' ) );
+
+        clearTimeout( timer );
+
+        if( isEnabled() && delay > 0 )
         {
-            go();
+            timer = setTimeout( doFormat, delay );
         }
-    } );
-
-    var editor = vscode.window.activeTextEditor;
-
-    if( editor && editor.document )
-    {
-        go( {} );
     }
+
+    function updateButton()
+    {
+        var extension = getExtension();
+
+        var enabled = isEnabled() === true;
+
+        button.text = "$(watch) $(" + ( enabled ? "check" : "x" ) + ")";
+        button.command = 'formatOnIdle.' + ( enabled ? 'disable' : 'enable' );
+        button.tooltip = ( enabled ? 'Disable' : 'Enable' ) + " Format On Idle for ." + extension + " files";
+
+        if( extension.length > 0 )
+        {
+            button.show();
+        }
+        else
+        {
+            button.hide();
+        }
+    }
+
+    function createButton()
+    {
+        if( button )
+        {
+            button.dispose();
+        }
+
+        button = vscode.window.createStatusBarItem(
+            vscode.workspace.getConfiguration( 'formatOnIdle' ).get( 'buttonAlignment' ) + 1,
+            vscode.workspace.getConfiguration( 'formatOnIdle' ).get( 'buttonPriority' ) );
+
+        context.subscriptions.push( button );
+
+        updateButton();
+    }
+
+    function configure( shouldEnable )
+    {
+        var enabled = vscode.workspace.getConfiguration( 'formatOnIdle' ).get( 'enabled' );
+        var extension = getExtension();
+        enabled[ extension ] = shouldEnable;
+        vscode.workspace.getConfiguration( 'formatOnIdle' ).update( 'enabled', enabled, true );
+    }
+
+    context.subscriptions.push( vscode.workspace.onDidChangeTextDocument( triggerFormat ) );
+
+    context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.enable', function() { configure( true ); } ) );
+    context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.disable', function() { configure( false ); } ) );
+
+    context.subscriptions.push( vscode.window.onDidChangeActiveTextEditor( function() 
+    {
+        clearTimeout( timer );
+        updateButton();
+    } ) );
+
+    context.subscriptions.push( vscode.workspace.onDidChangeConfiguration( function( e )
+    {
+        if(
+            e.affectsConfiguration( 'formatOnIdle.delay' ) ||
+            e.affectsConfiguration( 'formatOnIdle.enabled' ) )
+        {
+            triggerFormat();
+            updateButton();
+        }
+        else if(
+            e.affectsConfiguration( 'formatOnIdle.buttonAlignment' ) ||
+            e.affectsConfiguration( 'formatOnIdle.buttonPriority' ) )
+        {
+            createButton();
+        }
+    } ) );
+
+    createButton();
 }
 
 exports.activate = activate;
 
 function deactivate()
 {
+    clearTimeout( timer );
 }
 exports.deactivate = deactivate;
