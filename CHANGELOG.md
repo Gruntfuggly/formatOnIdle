@@ -1,3 +1,6 @@
+# v0.0.9 - 2018-08-30
+- Don't use onDidChangeTextDocument otherwise the update can become recursive
+
 # v0.0.8 - 2018-08-29
 - Use all editor settings for simplicity
 

@@ -117,7 +117,6 @@ function activate( context )
         vscode.workspace.getConfiguration( 'formatOnIdle' ).update( 'enabled', enabled, true );
     }
 
-    context.subscriptions.push( vscode.workspace.onDidChangeTextDocument( triggerFormat ) );
     context.subscriptions.push( vscode.window.onDidChangeTextEditorSelection( function( e )
     {
         if( e.kind === vscode.TextEditorSelectionChangeKind.Keyboard ||
