@@ -1,3 +1,6 @@
+# v0.0.11 - 2018-08-30
+- Use document version to trigger format
+
 # v0.0.10 - 2018-08-30
 - Improve cursor positioning after the format
 

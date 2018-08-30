@@ -3,6 +3,7 @@ var path = require( 'path' );
 
 var timer;
 var button;
+var lastVersion;
 
 function activate( context )
 {
@@ -24,6 +25,8 @@ function activate( context )
 
     function doFormat()
     {
+        timer = undefined;
+
         var editor = vscode.window.activeTextEditor;
         if( editor && editor.document )
         {
@@ -53,6 +56,7 @@ function activate( context )
                     {
                         editor.selection = previousSelection;
                         editor.selections = previousSelections;
+                        lastVersion = editor.document.version;
                     }
                 } );
             } ).catch( {} );
@@ -85,10 +89,18 @@ function activate( context )
         var delay = parseInt( vscode.workspace.getConfiguration( 'formatOnIdle' ).get( 'delay' ) );
 
         clearTimeout( timer );
+        timer = undefined;
 
         if( isEnabled() && delay > 0 )
         {
-            timer = setTimeout( doFormat, delay );
+            var editor = vscode.window.activeTextEditor;
+            var version = editor.document.version;
+
+            if( !lastVersion || version > lastVersion )
+            {
+                lastVersion = version;
+                timer = setTimeout( doFormat, delay );
+            }
         }
     }
 
@@ -139,22 +151,20 @@ function activate( context )
         vscode.workspace.getConfiguration( 'formatOnIdle' ).update( 'enabled', enabled, true );
     }
 
-    context.subscriptions.push( vscode.window.onDidChangeTextEditorSelection( function( e )
-    {
-        if( e.kind === vscode.TextEditorSelectionChangeKind.Keyboard ||
-            e.kind === vscode.TextEditorSelectionChangeKind.Mouse )
-        {
-            triggerFormat();
-        }
-    } ) );
+    context.subscriptions.push( vscode.window.onDidChangeTextEditorSelection( triggerFormat ) );
 
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.enable', function() { configure( true ); } ) );
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.disable', function() { configure( false ); } ) );
 
-    context.subscriptions.push( vscode.window.onDidChangeActiveTextEditor( function()
+    context.subscriptions.push( vscode.window.onDidChangeActiveTextEditor( function( e )
     {
         clearTimeout( timer );
+        timer = undefined;
         updateButton();
+        if( e && e.document )
+        {
+            lastVersion = e.document.version - 1;
+        }
     } ) );
 
     vscode.workspace.onDidOpenTextDocument( function()
@@ -166,6 +176,7 @@ function activate( context )
         else
         {
             clearTimeout( timer );
+            timer = undefined;
             updateButton();
         }
     } );
@@ -191,6 +202,7 @@ function activate( context )
 function deactivate()
 {
     clearTimeout( timer );
+    timer = undefined;
 }
 
 exports.activate = activate;
