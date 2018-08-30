@@ -48,6 +48,8 @@ function activate( context )
                 var previousSelections = [];
                 editor.selections.forEach( s => { previousSelections.push( copySelection( s ) ); } );
 
+                lastVersion = editor.document.version + 1;
+
                 var workspaceEdit = new vscode.WorkspaceEdit();
                 workspaceEdit.set( editor.document.uri, edits );
                 vscode.workspace.applyEdit( workspaceEdit ).then( function()
@@ -56,7 +58,6 @@ function activate( context )
                     {
                         editor.selection = previousSelection;
                         editor.selections = previousSelections;
-                        lastVersion = editor.document.version;
                     }
                 } );
             } ).catch( {} );

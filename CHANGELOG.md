@@ -1,3 +1,6 @@
+# v0.0.13 - 2018-08-30
+- Prevent recursion on undo
+
 # v0.0.12 - 2018-08-30
 - Improve version handling to trigger format
 
