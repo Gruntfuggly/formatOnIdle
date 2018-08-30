@@ -1,3 +1,6 @@
+# v0.0.12 - 2018-08-30
+- Improve version handling to trigger format
+
 # v0.0.11 - 2018-08-30
 - Use document version to trigger format
 
