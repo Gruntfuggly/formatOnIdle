@@ -30,9 +30,31 @@ function activate( context )
             var options = vscode.workspace.getConfiguration( 'editor' );
             vscode.commands.executeCommand( 'vscode.executeFormatDocumentProvider', editor.document.uri, options ).then( function( edits )
             {
+                function copySelection( source )
+                {
+                    var target = new vscode.Selection( source.anchor, source.active );
+                    target.end = new vscode.Position( source.end );
+                    target.isEmpty = source.isEmpty;
+                    target.isReversed = source.isReversed;
+                    target.isSingleLine = source.isSingleLine;
+                    target.start = new vscode.Position( source.start );
+                    return target;
+                }
+
+                var previousSelection = copySelection( editor.selection );
+                var previousSelections = [];
+                editor.selections.forEach( s => { previousSelections.push( copySelection( s ) ); } );
+
                 var workspaceEdit = new vscode.WorkspaceEdit();
                 workspaceEdit.set( editor.document.uri, edits );
-                vscode.workspace.applyEdit( workspaceEdit );
+                vscode.workspace.applyEdit( workspaceEdit ).then( function()
+                {
+                    if( editor.selection.start.line !== previousSelection.start.line )
+                    {
+                        editor.selection = previousSelection;
+                        editor.selections = previousSelections;
+                    }
+                } );
             } ).catch( {} );
         }
     }

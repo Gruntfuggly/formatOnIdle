@@ -1,3 +1,6 @@
+# v0.0.10 - 2018-08-30
+- Improve cursor positioning after the format
+
 # v0.0.9 - 2018-08-30
 - Don't use onDidChangeTextDocument otherwise the update can become recursive
 
