@@ -1,3 +1,6 @@
+# v0.0.14 - 2018-09-13
+- Inhibit format on undo/redo
+
 # v0.0.13 - 2018-08-30
 - Prevent recursion on undo
 
