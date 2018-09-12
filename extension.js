@@ -4,9 +4,27 @@ var path = require( 'path' );
 var timer;
 var button;
 var lastVersion;
+var versionStack = [];
 
 function activate( context )
 {
+    function hash( text )
+    {
+        var hash = 0;
+        if( text.length === 0 )
+        {
+            return hash;
+        }
+        for( var i = 0; i < text.length; i++ )
+        {
+            var char = text.charCodeAt( i );
+            hash = ( ( hash << 5 ) - hash ) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+
+        return hash;
+    }
+
     function isFormatterAvailable( done )
     {
         var editor = vscode.window.activeTextEditor;
@@ -85,8 +103,9 @@ function activate( context )
         return Object.keys( enabled ).length === 0 || ( extension.length > 0 && enabled[ extension ] );
     }
 
-    function triggerFormat()
+    function triggerFormat( e )
     {
+        console.log( "triggerFormat" );
         var delay = parseInt( vscode.workspace.getConfiguration( 'formatOnIdle' ).get( 'delay' ) );
 
         clearTimeout( timer );
@@ -99,7 +118,20 @@ function activate( context )
 
             if( !lastVersion || version > lastVersion )
             {
-                timer = setTimeout( doFormat, delay );
+                var currentHash = hash( editor.document.getText() );
+                console.log( "version:" + version + " lv:" + lastVersion );
+                console.log( "current:" + currentHash );
+                console.log( "stack:" + JSON.stringify( versionStack ) );
+                if( versionStack.length > 0 && versionStack[ versionStack.length - 1 ] === currentHash )
+                {
+                    console.log( "UNDO!" );
+                    // versionStack.pop();
+                }
+                // else  
+                {
+                    versionStack.push( currentHash );
+                    timer = setTimeout( doFormat, delay );
+                }
             }
         }
     }
@@ -152,7 +184,10 @@ function activate( context )
     }
 
     context.subscriptions.push( vscode.window.onDidChangeTextEditorSelection( triggerFormat ) );
-    context.subscriptions.push( vscode.workspace.onDidChangeTextDocument( triggerFormat ) );
+    context.subscriptions.push( vscode.workspace.onDidChangeTextDocument( function( e )
+    {
+        triggerFormat();
+    } ) );
 
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.enable', function() { configure( true ); } ) );
     context.subscriptions.push( vscode.commands.registerCommand( 'formatOnIdle.disable', function() { configure( false ); } ) );
