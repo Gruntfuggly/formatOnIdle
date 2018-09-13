@@ -26,7 +26,7 @@ You can install the latest version of the extension via the Visual Studio Market
 
 ### Source Code
 
-The source code is available on GitHub [here](https://github.com/Gruntfuggly/format-on-idle).
+The source code is available on GitHub [here](https://github.com/Gruntfuggly/formatOnIdle).
 
 ## Known Issues
 
