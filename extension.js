@@ -46,7 +46,7 @@ function activate( context )
 
                 var previousSelection = copySelection( editor.selection );
                 var previousSelections = [];
-                editor.selections.forEach( s => { previousSelections.push( copySelection( s ) ); } );
+                editor.selections.forEach( function( s ) { previousSelections.push( copySelection( s ) ); } );
 
                 lastVersion = editor.document.version + 1;
 
