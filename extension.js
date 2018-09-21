@@ -171,45 +171,47 @@ function activate( context )
         vscode.workspace.getConfiguration( 'formatOnIdle' ).update( 'enabled', enabled, true );
     }
 
-    context.subscriptions.push( vscode.workspace.onDidChangeTextDocument( function( e )
+    context.subscriptions.push( vscode.workspace.onDidChangeTextDocument( function( editor )
     {
-        var editor = vscode.window.activeTextEditor;
-        var currentHash = hash( editor.document.getText() );
+        if( editor && editor.document )
+        {
+            var currentHash = hash( editor.document.getText() );
 
-        if( versions.stack.length === 0 )
-        {
-            versions.stack.push( currentHash );
-            versions.position = 0;
-            triggerFormat();
-        }
-        else
-        {
-            var previous = versions.stack.indexOf( currentHash );
-            if( previous > -1 )
+            if( versions.stack.length === 0 )
             {
-                if( previous < versions.position )
-                {
-                    versions.position = previous;
-                }
-                else if( previous > versions.position )
-                {
-                    versions.position = previous;
-                }
+                versions.stack.push( currentHash );
+                versions.position = 0;
+                triggerFormat();
             }
             else
             {
-                versions.stack.splice( versions.position + 1, versions.stack.length - versions.position );
-                versions.stack.push( currentHash );
-                versions.position = versions.stack.length - 1;
-
-                if( versions.stack.length > maxStackSize )
+                var previous = versions.stack.indexOf( currentHash );
+                if( previous > -1 )
                 {
-                    var previousLength = versions.stack.length;
-                    versions.stack = versions.stack.splice( -maxStackSize );
-                    versions.position -= ( previousLength - maxStackSize );
+                    if( previous < versions.position )
+                    {
+                        versions.position = previous;
+                    }
+                    else if( previous > versions.position )
+                    {
+                        versions.position = previous;
+                    }
                 }
+                else
+                {
+                    versions.stack.splice( versions.position + 1, versions.stack.length - versions.position );
+                    versions.stack.push( currentHash );
+                    versions.position = versions.stack.length - 1;
 
-                triggerFormat();
+                    if( versions.stack.length > maxStackSize )
+                    {
+                        var previousLength = versions.stack.length;
+                        versions.stack = versions.stack.splice( -maxStackSize );
+                        versions.position -= ( previousLength - maxStackSize );
+                    }
+
+                    triggerFormat();
+                }
             }
         }
     } ) );

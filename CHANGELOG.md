@@ -1,3 +1,6 @@
+# v0.0.15 - 2018-09-21
+- Check for editor before checking document version
+
 # v0.0.14 - 2018-09-13
 - Inhibit format on undo/redo
 
